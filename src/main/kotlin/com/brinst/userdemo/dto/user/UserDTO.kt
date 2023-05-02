@@ -5,13 +5,13 @@ import com.brinst.userdemo.domain.user.User
 import com.brinst.userdemo.domain.user.UserStatus
 
 data class UserDTO(
-    val id : Long,
-    val username : String,
-    val role : Role,
+    val id: Long,
+    val username: String,
+    val role: Role,
     val status: UserStatus
 ) {
-    companion object{
-        fun convertDTO(user : User): UserDTO {
+    companion object {
+        fun convertDTO(user: User): UserDTO {
             return UserDTO(
                 id = user.id!!,
                 username = user.username,
@@ -22,8 +22,13 @@ data class UserDTO(
     }
 }
 
-data class UserRequestDTO (
-    val username : String,
-    val role : Role,
-    val status: UserStatus
+data class UserRequestDTO(
+    val username: String,
+    val email: String,
+    val password: String
+)
+
+data class LoginDTO(
+    val username: String,
+    val password: String
 )

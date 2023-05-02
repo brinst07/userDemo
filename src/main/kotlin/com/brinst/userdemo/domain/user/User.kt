@@ -1,13 +1,15 @@
 package com.brinst.userdemo.domain.user
 
 import jakarta.persistence.*
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.User
+import org.springframework.security.core.userdetails.UserDetails
 
 @Entity
 class User(
     val username: String,
     var password: String,
+    var email: String,
     @Enumerated(EnumType.STRING)
     var role: Role,
     @Enumerated(EnumType.STRING)
@@ -15,15 +17,36 @@ class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null
-) {
-
-    fun getAuthorities(): User {
-        return User(
-            username,
-            password,
-            listOf(SimpleGrantedAuthority("ROLE_${role}"))
-        )
+) : UserDetails {
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
+        return mutableListOf(SimpleGrantedAuthority(this.role.name))
     }
+
+    override fun getPassword(): String {
+        return this.password
+    }
+
+    override fun getUsername(): String {
+        return this.username
+    }
+
+    override fun isAccountNonExpired(): Boolean {
+        return true
+    }
+
+    override fun isAccountNonLocked(): Boolean {
+        return true
+    }
+
+    override fun isCredentialsNonExpired(): Boolean {
+        return true
+    }
+
+    override fun isEnabled(): Boolean {
+        return this.status == UserStatus.ACTIVATE
+    }
+
+
 }
 
 enum class Role {
