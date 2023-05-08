@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserService(
@@ -19,16 +20,31 @@ class UserService(
     private val jwtService: JwtService,
     private val authenticationManager: AuthenticationManager
 ) {
+    /**
+     * user list를 조회하는 메소드
+     */
+    @Transactional(readOnly = true)
     fun getUserList(): List<UserDTO> {
         return userRepository.findAll().map { UserDTO.convertDTO(it) }
     }
 
+    /**
+     * user의 id로 user를 조회하는 메소드
+     */
+    @Transactional(readOnly = true)
     fun getUserById(id: Long): UserDTO {
         return userRepository.getUserById(id).let { UserDTO.convertDTO(it) }
     }
 
+    /**
+     * 회원가입 메소드
+     */
+    @Transactional
     fun registerUser(userRequestDTO: UserRequestDTO): String {
-        //TODO 중복체크 로직 추가 할 것
+        //username, email 중복 체크
+        userRepository.findByUserNameOrEmail(userRequestDTO.username, userRequestDTO.email)
+            ?: throw IllegalArgumentException("해당 id, email은 중복되었습니다.")
+        //user 저장
         val user = userRepository.save(
             User(
                 username = userRequestDTO.username,
@@ -37,9 +53,13 @@ class UserService(
                 role = Role.MEMBER
             )
         )
+        //token 발급
         return jwtService.generateToken(user)
     }
 
+    /**
+     * login 메소드
+     */
     fun login(loginDTO: LoginDTO): String {
         this.authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(
@@ -52,7 +72,9 @@ class UserService(
         return jwtService.generateToken(user)
     }
 
-
+    /**
+     * returnType optional 대신 User로 리턴하기 위한 메소드
+     */
     fun UserRepository.getUserById(id: Long): User {
         return userRepository.findById(id).orElseThrow(::IllegalArgumentException)
     }
