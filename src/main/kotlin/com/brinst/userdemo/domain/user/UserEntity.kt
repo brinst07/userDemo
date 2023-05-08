@@ -6,10 +6,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 @Entity
-class User(
-    val username: String,
-    var password: String,
-    var email: String,
+class UserEntity(
+    private val username: String = "",
+    private var password: String = "",
+    var email: String = "",
     @Enumerated(EnumType.STRING)
     var role: Role,
     @Enumerated(EnumType.STRING)
@@ -21,11 +21,9 @@ class User(
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf(SimpleGrantedAuthority(this.role.name))
     }
-
     override fun getPassword(): String {
         return this.password
     }
-
     override fun getUsername(): String {
         return this.username
     }

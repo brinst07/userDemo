@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "3.0.5"
     id("io.spring.dependency-management") version "1.1.0"
+    id("org.asciidoctor.jvm.convert") version "3.3.2"
     kotlin("jvm") version "1.7.22"
     kotlin("plugin.spring") version "1.7.22"
     kotlin("plugin.jpa") version "1.7.22"
@@ -11,6 +12,8 @@ plugins {
 group = "com.brinst"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
+
+val asciidoctorExt by configurations.creating
 
 repositories {
     mavenCentral()
@@ -28,6 +31,8 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.10")
+    asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
+    testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
 }
 
 tasks.withType<KotlinCompile> {
@@ -39,4 +44,25 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+val snippetsDir by extra {
+    file("build/generated-snippets")
+}
+
+tasks {
+    asciidoctor {
+        dependsOn(test)
+        configurations("asciidoctorExt")
+        baseDirFollowsSourceFile()  // 3
+        inputs.dir(snippetsDir)
+    }
+    register<Copy>("copyDocument") {  // 4
+        dependsOn(asciidoctor)
+        from(file("build/docs/asciidoc/index.html"))
+        into(file("src/main/resources/static/docs"))
+    }
+    bootJar {
+        dependsOn("copyDocument")  // 5
+    }
 }

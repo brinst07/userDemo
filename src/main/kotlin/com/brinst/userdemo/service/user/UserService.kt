@@ -2,7 +2,7 @@ package com.brinst.userdemo.service.user
 
 import com.brinst.userdemo.config.JwtService
 import com.brinst.userdemo.domain.user.Role
-import com.brinst.userdemo.domain.user.User
+import com.brinst.userdemo.domain.user.UserEntity
 import com.brinst.userdemo.dto.user.LoginDTO
 import com.brinst.userdemo.dto.user.UserDTO
 import com.brinst.userdemo.dto.user.UserRequestDTO
@@ -45,8 +45,8 @@ class UserService(
         userRepository.findByUserNameOrEmail(userRequestDTO.username, userRequestDTO.email)
             ?: throw IllegalArgumentException("해당 id, email은 중복되었습니다.")
         //user 저장
-        val user = userRepository.save(
-            User(
+        val userEntity = userRepository.save(
+            UserEntity(
                 username = userRequestDTO.username,
                 email = userRequestDTO.email,
                 password = passwordEncoder.encode(userRequestDTO.password),
@@ -54,7 +54,7 @@ class UserService(
             )
         )
         //token 발급
-        return jwtService.generateToken(user)
+        return jwtService.generateToken(userEntity)
     }
 
     /**
@@ -75,7 +75,7 @@ class UserService(
     /**
      * returnType optional 대신 User로 리턴하기 위한 메소드
      */
-    fun UserRepository.getUserById(id: Long): User {
+    fun UserRepository.getUserById(id: Long): UserEntity {
         return userRepository.findById(id).orElseThrow(::IllegalArgumentException)
     }
 }

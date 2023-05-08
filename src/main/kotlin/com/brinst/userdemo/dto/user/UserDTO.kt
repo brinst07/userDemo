@@ -1,7 +1,7 @@
 package com.brinst.userdemo.dto.user
 
 import com.brinst.userdemo.domain.user.Role
-import com.brinst.userdemo.domain.user.User
+import com.brinst.userdemo.domain.user.UserEntity
 import com.brinst.userdemo.domain.user.UserStatus
 
 data class UserDTO(
@@ -11,12 +11,12 @@ data class UserDTO(
     val status: UserStatus
 ) {
     companion object {
-        fun convertDTO(user: User): UserDTO {
+        fun convertDTO(userEntity: UserEntity): UserDTO {
             return UserDTO(
-                id = user.id!!,
-                username = user.username,
-                role = user.role,
-                status = user.status,
+                id = userEntity.id!!,
+                username = userEntity.username,
+                role = userEntity.role,
+                status = userEntity.status,
             )
         }
     }
