@@ -42,8 +42,9 @@ class UserService(
     @Transactional
     fun registerUser(userRequestDTO: UserRequestDTO): String {
         //username, email 중복 체크
-        userRepository.findByUserNameOrEmail(userRequestDTO.username, userRequestDTO.email)
-            ?: throw IllegalArgumentException("해당 id, email은 중복되었습니다.")
+        if (userRepository.findByUsernameOrEmail(userRequestDTO.username, userRequestDTO.email) != null) {
+            throw IllegalArgumentException("해당 id, email은 중복되었습니다.")
+        }
         //user 저장
         val userEntity = userRepository.save(
             UserEntity(

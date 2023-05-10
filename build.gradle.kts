@@ -33,6 +33,9 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.10")
     asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 }
 
 tasks.withType<KotlinCompile> {
