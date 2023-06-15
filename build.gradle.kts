@@ -14,7 +14,7 @@ version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 val asciidoctorExt by configurations.creating
-
+val kotestVersion = "5.6.2"
 repositories {
     mavenCentral()
 }
@@ -33,13 +33,15 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.10")
     asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
-    testImplementation ("io.kotest:kotest-runner-junit5:$version")
-    testImplementation ("io.kotest:kotest-assertions-core:$version")
-    testImplementation ("io.kotest:kotest-property:$version")
+    testImplementation ("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation ("io.kotest:kotest-assertions-core:$kotestVersion")
+    testImplementation ("io.kotest:kotest-property:$kotestVersion")
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 }
+
+
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
@@ -72,3 +74,4 @@ tasks {
         dependsOn("copyDocument")  // 5
     }
 }
+

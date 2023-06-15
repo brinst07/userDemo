@@ -44,6 +44,11 @@ class UserEntity(
         return this.status == UserStatus.ACTIVATE
     }
 
+    fun updateStatus(userStatus: UserStatus) {
+        this.status = userStatus
+    }
+
+
 
 }
 
