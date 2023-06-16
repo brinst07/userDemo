@@ -24,7 +24,7 @@ class UserController(
     }
 
     @PostMapping
-    fun registerUser(@RequestBody userRequestDTO: UserRequestDTO) : ResponseEntity<String> {
+    fun registerUser(@RequestBody userRequestDTO: UserRequestDTO) : ResponseEntity<UserDTO> {
         return ResponseEntity(userService.registerUser(userRequestDTO), HttpStatus.OK)
     }
 

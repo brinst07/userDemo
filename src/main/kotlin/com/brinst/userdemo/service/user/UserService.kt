@@ -15,10 +15,10 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserService(
-    private val userRepository: UserRepository,
-    private val passwordEncoder: PasswordEncoder,
-    private val jwtService: JwtService,
-    private val authenticationManager: AuthenticationManager
+        private val userRepository: UserRepository,
+        private val passwordEncoder: PasswordEncoder,
+        private val jwtService: JwtService,
+        private val authenticationManager: AuthenticationManager
 ) {
     /**
      * user list를 조회하는 메소드
@@ -40,36 +40,37 @@ class UserService(
      * 회원가입 메소드
      */
     @Transactional
-    fun registerUser(userRequestDTO: UserRequestDTO): String {
+    fun registerUser(userRequestDTO: UserRequestDTO): UserDTO {
         //username, email 중복 체크
-        if (userRepository.findByUsernameOrEmail(userRequestDTO.username, userRequestDTO.email) != null) {
-            throw IllegalArgumentException("해당 id, email은 중복되었습니다.")
-        }
+        require(userRepository.findByUsernameOrEmail(userRequestDTO.username, userRequestDTO.email) == null)
+        { "해당 id, email은 중복되었습니다." }
         //user 저장
         val userEntity = userRepository.save(
-            UserEntity(
-                username = userRequestDTO.username,
-                email = userRequestDTO.email,
-                password = passwordEncoder.encode(userRequestDTO.password),
-                role = Role.MEMBER
-            )
+                UserEntity(
+                        username = userRequestDTO.username,
+                        email = userRequestDTO.email,
+                        password = passwordEncoder.encode(userRequestDTO.password),
+                        role = Role.MEMBER
+                )
         )
-        //token 발급
-        return jwtService.generateToken(userEntity)
+        //user 정보 리턴
+        return UserDTO.convertDTO(userEntity)
     }
 
     /**
      * login 메소드
      */
     fun login(loginDTO: LoginDTO): String {
+        val user = userRepository.findByUsername(loginDTO.username)
+                ?: throw IllegalArgumentException("user가 존재하지 않습니다.")
+
         this.authenticationManager.authenticate(
-            UsernamePasswordAuthenticationToken(
-                loginDTO.username,
-                loginDTO.password
-            )
+                UsernamePasswordAuthenticationToken(
+                        loginDTO.username,
+                        loginDTO.password
+                )
         )
 
-        val user = userRepository.findByUsername(loginDTO.username)
         return jwtService.generateToken(user)
     }
 
